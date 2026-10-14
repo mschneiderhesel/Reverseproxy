@@ -1,0 +1,73 @@
+# Smart-Home Reverse Proxy (nginx + Let's Encrypt)
+# Deployment in Portainer: Stacks -> Add stack -> Repository (siehe README.md)
+# Alle Einstellungen kommen aus den Umgebungsvariablen des Stacks.
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    image: smarthome-proxy/nginx:local
+    container_name: smarthome-proxy
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      SERVICES: ${SERVICES:-}
+      EXTRA_DOMAINS: ${EXTRA_DOMAINS:-}
+      CERT_NAME: ${CERT_NAME:-smarthome}
+      BASIC_AUTH_USERS: ${BASIC_AUTH_USERS:-}
+      LAN_CIDRS: ${LAN_CIDRS:-192.168.0.0/16 10.0.0.0/8 fc00::/7}
+      RATE_LIMIT: ${RATE_LIMIT:-20r/s}
+      RATE_BURST: ${RATE_BURST:-100}
+      CLIENT_MAX_BODY_SIZE: ${CLIENT_MAX_BODY_SIZE:-100m}
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - letsencrypt:/etc/letsencrypt:ro
+      - acme-webroot:/var/www/certbot:ro
+    networks:
+      - proxy
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  certbot:
+    build:
+      context: .
+      dockerfile: certbot/Dockerfile
+    image: smarthome-proxy/certbot:local
+    container_name: smarthome-proxy-certbot
+    restart: unless-stopped
+    depends_on:
+      - nginx
+    environment:
+      SERVICES: ${SERVICES:-}
+      EXTRA_DOMAINS: ${EXTRA_DOMAINS:-}
+      CERT_NAME: ${CERT_NAME:-smarthome}
+      LE_EMAIL: ${LE_EMAIL:-}
+      LE_STAGING: ${LE_STAGING:-0}
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - acme-webroot:/var/www/certbot
+    networks:
+      - proxy
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "3" }
+
+volumes:
+  letsencrypt:      # Zertifikate + Let's-Encrypt-Account (überlebt Redeploys)
+  acme-webroot:
+
+networks:
+  proxy:
+    name: smarthome-proxy
+    ipam:
+      config:
+        - subnet: ${PROXY_SUBNET:-172.30.250.0/24}

@@ -1,0 +1,4 @@
+# Shell-Skripte und Configs immer mit LF auschecken (sonst brechen sie im Container)
+*.sh   text eol=lf
+*.conf text eol=lf
+Dockerfile text eol=lf
