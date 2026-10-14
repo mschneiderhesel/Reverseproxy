@@ -21,7 +21,7 @@ if [ -z "$DOMAINS" ]; then
     echo "        In Portainer unter Stacks -> <Stack> -> Environment variables setzen" >&2
     echo "        (nicht am einzelnen Container) und 'Update the stack' klicken." >&2
     # nicht im Sekundentakt neu starten und das Log fluten
-    sleep 300
+    pause 300
     exit 1
 fi
 
