@@ -16,7 +16,14 @@ pause() { sleep "$1" & wait $!; }
 
 parse_services >/dev/null || exit 1   # validiert SERVICES, bricht mit klarer Meldung ab
 DOMAINS=$(all_domains)
-[ -n "$DOMAINS" ] || die "Keine Domains – SERVICES bzw. EXTRA_DOMAINS setzen."
+if [ -z "$DOMAINS" ]; then
+    echo "FEHLER: SERVICES ist in diesem Container leer." >&2
+    echo "        In Portainer unter Stacks -> <Stack> -> Environment variables setzen" >&2
+    echo "        (nicht am einzelnen Container) und 'Update the stack' klicken." >&2
+    # nicht im Sekundentakt neu starten und das Log fluten
+    sleep 300
+    exit 1
+fi
 
 DOMAIN_ARGS=""
 for d in $DOMAINS; do DOMAIN_ARGS="$DOMAIN_ARGS -d $d"; done
