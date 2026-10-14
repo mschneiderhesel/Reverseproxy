@@ -55,7 +55,8 @@ unterstützen.
 | **DuckDNS** (kostenlos, empfohlen) | ✅ automatisch | `meinhaus.duckdns.org` → `ha.meinhaus.duckdns.org`, `nodered.meinhaus.duckdns.org` usw. zeigen automatisch auf dieselbe IP |
 | deSEC / dynv6 (kostenlos) | ✅ | Wildcard-Eintrag `*` anlegen |
 | Eigene Domain (IONOS, Strato, …) | ✅ | `*.home.deinedomain.de` als CNAME auf deinen DynDNS-Namen |
-| MyFRITZ!, No-IP Free, DynDNS „Basic" | ❌ meist nur 1 Name | Dann entweder nur **einen** Dienst veröffentlichen oder zusätzlich DuckDNS nutzen |
+| **DynDNS (dyn.com / Oracle Dyn)** | ✅ | Im Dyn-Account beim Hostnamen **„Wildcard" aktivieren** → `ha.meinhaus.dyndns.org` usw. funktionieren. Alternativ je Dienst einen eigenen Host anlegen (`meinha.dyndns.org`, `meinnodered.dyndns.org`, …) – zählt aber gegen das Host-Kontingent |
+| MyFRITZ!, No-IP Free | ❌ meist nur 1 Name | Dann entweder nur **einen** Dienst veröffentlichen oder zusätzlich DuckDNS nutzen |
 
 Test: `nslookup ha.meinhaus.duckdns.org` muss deine öffentliche IP liefern.
 
